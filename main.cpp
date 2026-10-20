@@ -26,7 +26,7 @@ public:
 	};
 };
 
-void printTerminalUsageInfo(char* binaryName) {
+void printTerminalUsageInfo(const char* binaryName) {
 	std::cout << "Welcome to tikee! Usage:\n\n"
 				 "  " << binaryName << " <command>\n\n"
 				 "Available commands:\n\n"
@@ -47,8 +47,10 @@ enum command {
 
 cmd::command getCmdInput(int argc, char* argv[]) {
 
+	const char* binaryName { argv[0] };
+
 	if (argc < 2) {
-		printTerminalUsageInfo(argv[0]);
+		printTerminalUsageInfo(binaryName);
 		return cmd::NO_COMMAND;
 	}
 
@@ -60,7 +62,7 @@ cmd::command getCmdInput(int argc, char* argv[]) {
 			argument == "help" ||
 			argument == "-help") {
 
-			printTerminalUsageInfo(argv[0]);
+			printTerminalUsageInfo(binaryName);
 			return cmd::NO_COMMAND;
 		}
 		else if (argument == "start") {
@@ -74,6 +76,7 @@ cmd::command getCmdInput(int argc, char* argv[]) {
 
 	}
 
+	printTerminalUsageInfo(binaryName);
 	return cmd::NO_COMMAND;
 }
 
