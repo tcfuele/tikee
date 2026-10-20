@@ -28,15 +28,28 @@ public:
 
 void printTerminalUsageInfo(char* binaryName) {
 	std::cout << "Welcome to tikee! Usage:\n\n"
-				 "  " << binaryName << " <command>\n"
-				 "  type 'tikee --help' for more info!";
+				 "  " << binaryName << " <command>\n\n"
+				 "Available commands:\n\n"
+				 "start    Start the timer\n"
+				 "stop     Stops the timer\n"
+				 "\ntype 'tikee --help' for more info!\n";
 }
 
-void getCmdInput(int argc, char* argv[]) {
+namespace cmd {
+
+enum command {
+	NO_COMMAND,
+	START_TIMER,
+	STOP_TIMER,
+};
+
+}
+
+cmd::command getCmdInput(int argc, char* argv[]) {
 
 	if (argc < 2) {
 		printTerminalUsageInfo(argv[0]);
-		return;
+		return cmd::NO_COMMAND;
 	}
 
 	for (int i = 1; i < argc; i++) {
@@ -48,19 +61,29 @@ void getCmdInput(int argc, char* argv[]) {
 			argument == "-help") {
 
 			printTerminalUsageInfo(argv[0]);
-			return;
+			return cmd::NO_COMMAND;
 		}
 		else if (argument == "start") {
-			
+			std::cout << "starting\n";
+			return cmd::START_TIMER;
+		}
+		else if (argument == "stop") {
+			std::cout << "stopping\n";
+			return cmd::STOP_TIMER;
 		}
 
 	}
+
+	return cmd::NO_COMMAND;
 }
 
 int main(int argc, char* argv[]) {
 
-	getCmdInput(argc, argv);
+	cmd::command userCmd { getCmdInput(argc, argv) };
 
+	if (userCmd == cmd::NO_COMMAND) {
+		return 0;
+	}
 	/* TODO:
 	 * get input mode
 	 * if not started we start or error handle
