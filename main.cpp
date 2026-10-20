@@ -1,7 +1,7 @@
 #include <fstream>
 #include <iostream>
 #include <chrono>
-#include <thread>
+#include <string_view>
 
 class timeKeeper {
 private:
@@ -26,7 +26,40 @@ public:
 	};
 };
 
-int main() {
+void printTerminalUsageInfo(char* binaryName) {
+	std::cout << "Welcome to tikee! Usage:\n\n"
+				 "  " << binaryName << " <command>\n"
+				 "  type 'tikee --help' for more info!";
+}
+
+void getCmdInput(int argc, char* argv[]) {
+
+	if (argc < 2) {
+		printTerminalUsageInfo(argv[0]);
+		return;
+	}
+
+	for (int i = 1; i < argc; i++) {
+		std::string_view argument = argv[i];
+
+		if (argument == "-h" || 
+			argument == "--help" ||
+			argument == "help" ||
+			argument == "-help") {
+
+			printTerminalUsageInfo(argv[0]);
+			return;
+		}
+		else if (argument == "start") {
+			
+		}
+
+	}
+}
+
+int main(int argc, char* argv[]) {
+
+	getCmdInput(argc, argv);
 
 	/* TODO:
 	 * get input mode
