@@ -4,30 +4,48 @@
 #include <string_view>
 
 class TimeKeeper {
-private:
+
 	using Clock = std::chrono::steady_clock;
 	using Second = std::chrono::duration<double, std::ratio<1>>;
 	using fs = std::fstream;
 
-	std::chrono::time_point<Clock> m_beg;
-	const char* m_fileName;
-	fs m_timeFile;
 public:
-	explicit TimeKeeper(const char* fileName = "logr_start_time.log") : m_fileName{fileName} {
-		m_beg = Clock::now();
-		m_timeFile.open(m_fileName, fs::in | fs::out | fs::binary);
 
-		if (!m_timeFile) {
-			std::cerr << "[logr] ERROR: No time logging file to write to!";
-			std::exit(1);
-		}
-	};
-
-	enum command {
+	enum Command {
 		NO_COMMAND,
 		START_TIMER,
 		STOP_TIMER,
 	};
+
+	explicit TimeKeeper(Command cmd, const std::string = ".tikee.log");
+
+private:
+
+	std::string m_fileName;
+	fs m_timeFile;
+};
+
+TimeKeeper::TimeKeeper(Command cmd, const std::string fileName)
+	: m_fileName{std::move(fileName)}
+    , m_timeFile(m_fileName, std::ios::in | std::ios::out | std::ios::app)
+	{
+
+	auto timeNow = Clock::now();
+
+	if (!m_timeFile.is_open()) {
+		std::cerr << "[tikee] ERROR: No time logging file to write to!";
+		std::exit(1);
+	}
+
+	if (cmd == 1) {
+		// DEBUG
+		std::cout << "[tikee] Log started at:" << timeNow.time_since_epoch().count() << '\n';
+		m_timeFile << timeNow.time_since_epoch().count() << '\n';
+
+	}
+	if (m_timeFile.is_open()) {
+		m_timeFile.close();
+	}
 };
 
 void printTerminalUsageInfo(const char* binaryName) {
@@ -39,7 +57,7 @@ void printTerminalUsageInfo(const char* binaryName) {
 				 "\ntype 'tikee --help' for more info!\n";
 }
 
-TimeKeeper::command getCmdInput(int argc, char* argv[]) {
+TimeKeeper::Command getCmdInput(int argc, char* argv[]) {
 
 	const char* binaryName { argv[0] };
 
@@ -60,10 +78,12 @@ TimeKeeper::command getCmdInput(int argc, char* argv[]) {
 			return TimeKeeper::NO_COMMAND;
 		}
 		else if (argument == "start") {
+			// DEBUG
 			std::cout << "starting\n";
 			return TimeKeeper::START_TIMER;
 		}
 		else if (argument == "stop") {
+			// DEBUG
 			std::cout << "stopping\n";
 			return TimeKeeper::STOP_TIMER;
 		}
@@ -76,11 +96,13 @@ TimeKeeper::command getCmdInput(int argc, char* argv[]) {
 
 int main(int argc, char* argv[]) {
 
-	TimeKeeper::command userCmd { getCmdInput(argc, argv) };
+	TimeKeeper::Command userCmd { getCmdInput(argc, argv) };
 
 	if (userCmd == TimeKeeper::NO_COMMAND) {
 		return 0;
 	}
+
+	TimeKeeper tikee {userCmd, ".tikee.log"};
 
 	/* TODO:
 	 * if not started we start or error handle
