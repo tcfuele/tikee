@@ -3,7 +3,7 @@
 #include <chrono>
 #include <string_view>
 
-class timeKeeper {
+class TimeKeeper {
 private:
 	using Clock = std::chrono::steady_clock;
 	using Second = std::chrono::duration<double, std::ratio<1>>;
@@ -13,7 +13,7 @@ private:
 	const char* m_fileName;
 	fs m_timeFile;
 public:
-	explicit timeKeeper(const char* fileName = "logr_start_time.log") : m_fileName{fileName} {
+	explicit TimeKeeper(const char* fileName = "logr_start_time.log") : m_fileName{fileName} {
 		m_beg = Clock::now();
 		m_timeFile.open(m_fileName, fs::in | fs::out | fs::binary);
 
@@ -21,8 +21,12 @@ public:
 			std::cerr << "[logr] ERROR: No time logging file to write to!";
 			std::exit(1);
 		}
+	};
 
-
+	enum command {
+		NO_COMMAND,
+		START_TIMER,
+		STOP_TIMER,
 	};
 };
 
@@ -35,23 +39,13 @@ void printTerminalUsageInfo(const char* binaryName) {
 				 "\ntype 'tikee --help' for more info!\n";
 }
 
-namespace cmd {
-
-enum command {
-	NO_COMMAND,
-	START_TIMER,
-	STOP_TIMER,
-};
-
-}
-
-cmd::command getCmdInput(int argc, char* argv[]) {
+TimeKeeper::command getCmdInput(int argc, char* argv[]) {
 
 	const char* binaryName { argv[0] };
 
 	if (argc < 2) {
 		printTerminalUsageInfo(binaryName);
-		return cmd::NO_COMMAND;
+		return TimeKeeper::NO_COMMAND;
 	}
 
 	for (int i = 1; i < argc; i++) {
@@ -63,32 +57,32 @@ cmd::command getCmdInput(int argc, char* argv[]) {
 			argument == "-help") {
 
 			printTerminalUsageInfo(binaryName);
-			return cmd::NO_COMMAND;
+			return TimeKeeper::NO_COMMAND;
 		}
 		else if (argument == "start") {
 			std::cout << "starting\n";
-			return cmd::START_TIMER;
+			return TimeKeeper::START_TIMER;
 		}
 		else if (argument == "stop") {
 			std::cout << "stopping\n";
-			return cmd::STOP_TIMER;
+			return TimeKeeper::STOP_TIMER;
 		}
 
 	}
 
 	printTerminalUsageInfo(binaryName);
-	return cmd::NO_COMMAND;
+	return TimeKeeper::NO_COMMAND;
 }
 
 int main(int argc, char* argv[]) {
 
-	cmd::command userCmd { getCmdInput(argc, argv) };
+	TimeKeeper::command userCmd { getCmdInput(argc, argv) };
 
-	if (userCmd == cmd::NO_COMMAND) {
+	if (userCmd == TimeKeeper::NO_COMMAND) {
 		return 0;
 	}
+
 	/* TODO:
-	 * get input mode
 	 * if not started we start or error handle
 	 * we want to create a file if we are tracking in some temp dir
 	 * if file is present we are tracking, otherwise we through error
