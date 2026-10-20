@@ -28,10 +28,15 @@ public:
 
 int main() {
 
-	//get input mode
-	// if not started we start or error handle
-	// if started and want to track we track or error handle
+	/* TODO:
+	 * get input mode
+	 * if not started we start or error handle
+	 * we want to create a file if we are tracking in some temp dir
+	 * if file is present we are tracking, otherwise we through error
+	 * if started and want to track we track or error handle
+	 */
 
+	/*
 	auto const cacheTime = std::chrono::system_clock::now().time_since_epoch().count();
 	writeTimeFile.write(reinterpret_cast<char const*>(&cacheTime), sizeof(cacheTime));
 	writeTimeFile.close();
@@ -57,7 +62,7 @@ int main() {
 	std::chrono::system_clock::time_point const validFinishTime{ std::chrono::system_clock::duration{ logFinishTime } };
 	std::time_t const writtenTime { std::chrono::system_clock::to_time_t(validFinishTime)};
 	std::cout << std::ctime(&writtenTime) << '\n';
-
+	*/
 
 
 	return 0;
